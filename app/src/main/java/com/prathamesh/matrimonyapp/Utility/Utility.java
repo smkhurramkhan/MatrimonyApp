@@ -1,13 +1,11 @@
 package com.prathamesh.matrimonyapp.Utility;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -17,9 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.prathamesh.matrimonyapp.HomeActivity;
-import com.prathamesh.matrimonyapp.Login_Page;
-import com.prathamesh.matrimonyapp.Model.User;
+import com.prathamesh.matrimonyapp.model.User;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;

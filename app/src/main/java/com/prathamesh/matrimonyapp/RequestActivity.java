@@ -19,7 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.prathamesh.matrimonyapp.adapter.HomeItemAdapter;
-import com.prathamesh.matrimonyapp.Model.User;
+import com.prathamesh.matrimonyapp.model.User;
 
 import java.util.ArrayList;
 import java.util.List;

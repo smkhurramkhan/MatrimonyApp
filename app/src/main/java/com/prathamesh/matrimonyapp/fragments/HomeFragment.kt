@@ -15,7 +15,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.prathamesh.matrimonyapp.Model.User
+import com.prathamesh.matrimonyapp.model.User
 import com.prathamesh.matrimonyapp.R
 import com.prathamesh.matrimonyapp.adapter.HomeItemAdapter
 import java.lang.Boolean

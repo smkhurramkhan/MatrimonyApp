@@ -1,15 +1,12 @@
 package com.prathamesh.matrimonyapp;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,8 +16,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.prathamesh.matrimonyapp.Model.PsChatAdapter;
-import com.prathamesh.matrimonyapp.Model.userMessage;
+import com.prathamesh.matrimonyapp.adapter.PsChatAdapter;
+import com.prathamesh.matrimonyapp.model.userMessage;
 import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;

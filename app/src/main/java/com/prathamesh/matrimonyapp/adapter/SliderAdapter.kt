@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.prathamesh.matrimonyapp.Model.SliderImages
+import com.prathamesh.matrimonyapp.model.SliderImages
 import com.prathamesh.matrimonyapp.R
 import com.smarteist.autoimageslider.SliderViewAdapter
 

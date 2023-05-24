@@ -13,7 +13,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.prathamesh.matrimonyapp.Model.User
+import com.prathamesh.matrimonyapp.model.User
 import com.prathamesh.matrimonyapp.PersonalChatAC
 import com.prathamesh.matrimonyapp.ProfileActivity
 import com.prathamesh.matrimonyapp.R

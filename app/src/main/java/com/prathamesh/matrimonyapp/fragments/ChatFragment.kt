@@ -14,7 +14,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.prathamesh.matrimonyapp.adapter.ChatListAdapter
-import com.prathamesh.matrimonyapp.Model.ChatUser
+import com.prathamesh.matrimonyapp.model.ChatUser
 import com.prathamesh.matrimonyapp.R
 
 class ChatFragment : Fragment() {
