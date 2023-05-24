@@ -1,9 +1,5 @@
 package com.prathamesh.matrimonyapp;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -14,9 +10,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,11 +30,9 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class ImageActivityPart4 extends AppCompatActivity {
-
 
 
     UploadTask uploadTask;
@@ -78,9 +74,6 @@ public class ImageActivityPart4 extends AppCompatActivity {
     private int pos;
 
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,43 +102,42 @@ public class ImageActivityPart4 extends AppCompatActivity {
         prev = findViewById(R.id.Prev3CreateAcc);
 
 
-
         getDetailsFromFirebase();
 
-        image1.setOnClickListener(v->{
+        image1.setOnClickListener(v -> {
             CropImage.activity().setCropShape(CropImageView.CropShape.RECTANGLE)
                     .start(ImageActivityPart4.this);
         });
 
-        image2.setOnClickListener(v->{
+        image2.setOnClickListener(v -> {
             CropImage.activity().setCropShape(CropImageView.CropShape.RECTANGLE)
                     .start(ImageActivityPart4.this);
         });
 
-        image3.setOnClickListener(v->{
+        image3.setOnClickListener(v -> {
             CropImage.activity().setCropShape(CropImageView.CropShape.RECTANGLE)
                     .start(ImageActivityPart4.this);
         });
 
-        image4.setOnClickListener(v->{
+        image4.setOnClickListener(v -> {
             CropImage.activity().setCropShape(CropImageView.CropShape.RECTANGLE)
                     .start(ImageActivityPart4.this);
         });
 
 
-        delete1.setOnClickListener(v->{
+        delete1.setOnClickListener(v -> {
             FirebaseDatabase.getInstance().getReference().child("Users").child(firebaseUser.getUid()).child("imagesUser").child("image1").removeValue();
         });
 
-        delete2.setOnClickListener(v->{
+        delete2.setOnClickListener(v -> {
             FirebaseDatabase.getInstance().getReference().child("Users").child(firebaseUser.getUid()).child("imagesUser").child("image2").removeValue();
         });
 
-        delete3.setOnClickListener(v->{
+        delete3.setOnClickListener(v -> {
             FirebaseDatabase.getInstance().getReference().child("Users").child(firebaseUser.getUid()).child("imagesUser").child("image3").removeValue();
         });
 
-        delete4.setOnClickListener(v->{
+        delete4.setOnClickListener(v -> {
             FirebaseDatabase.getInstance().getReference().child("Users").child(firebaseUser.getUid()).child("imagesUser").child("image4").removeValue();
         });
 
@@ -153,7 +145,7 @@ public class ImageActivityPart4 extends AppCompatActivity {
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(ImageActivityPart4.this , CreateActivityPart3.class));
+                startActivity(new Intent(ImageActivityPart4.this, CreateActivityPart3.class));
                 finish();
             }
         });
@@ -167,8 +159,8 @@ public class ImageActivityPart4 extends AppCompatActivity {
     }
 
 
-    private void uploadDetails(){
-        Intent intent = new Intent(ImageActivityPart4.this , HomeActivity.class);
+    private void uploadDetails() {
+        Intent intent = new Intent(ImageActivityPart4.this, HomeActivity.class);
         startActivity(intent);
         finish();
     }
@@ -194,56 +186,50 @@ public class ImageActivityPart4 extends AppCompatActivity {
         if (imageUri != null) {
             StorageReference fileREf = storageReference.child(System.currentTimeMillis() + ".jpeg");
             uploadTask = fileREf.putFile(imageUri);
-            uploadTask.continueWithTask(new Continuation() {
-                @Override
-                public Object then(@NonNull Task task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-                    return fileREf.getDownloadUrl();
+            uploadTask.continueWithTask((Continuation) task -> {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
                 }
-            }).addOnCompleteListener(new OnCompleteListener() {
-                @Override
-                public void onComplete(@NonNull Task task) {
-                    if (task.isSuccessful()) {
-                        String name;
-                        Uri dowloadUri = (Uri) task.getResult();
-                        if (image1url == null){
-                            image1url = dowloadUri.toString();
-                            cuView = image1;
-                            imageDataInt = image1.getId();
-                            url = image1url;
-                            name = "image1";
-                        }else if (image2url == null){
-                            image2url = dowloadUri.toString();
-                            cuView = image2;
-                            imageDataInt = image2.getId();
-                            url = image2url;
-                            name = "image2";
-                        }else if (image3url == null) {
-                            image3url = dowloadUri.toString();
-                            cuView = image3;
-                            imageDataInt = image1.getId();
-                            url = image3url;
-                            name = "image3";
-                        }else if (image4url == null) {
-                            image4url = dowloadUri.toString();
-                            cuView = image4;
-                            imageDataInt = image4.getId();
-                            url = image4url;
-                            name = "image4";
-                        }else {
-                            return;
-                        }
-                        Picasso.get().load(url).into(cuView);
-                        FirebaseDatabase.getInstance().getReference().child("Users").child(firebaseUser.getUid())
-                                .child("imagesUser").child(name).setValue(url);
-                        FirebaseDatabase.getInstance().getReference().child("Images").child(firebaseUser.getUid()).child(name).setValue(url);
-                        pd.dismiss();
-
+                return fileREf.getDownloadUrl();
+            }).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    String name;
+                    Uri dowloadUri = (Uri) task.getResult();
+                    if (image1url == null) {
+                        image1url = dowloadUri.toString();
+                        cuView = image1;
+                        imageDataInt = image1.getId();
+                        url = image1url;
+                        name = "image1";
+                    } else if (image2url == null) {
+                        image2url = dowloadUri.toString();
+                        cuView = image2;
+                        imageDataInt = image2.getId();
+                        url = image2url;
+                        name = "image2";
+                    } else if (image3url == null) {
+                        image3url = dowloadUri.toString();
+                        cuView = image3;
+                        imageDataInt = image1.getId();
+                        url = image3url;
+                        name = "image3";
+                    } else if (image4url == null) {
+                        image4url = dowloadUri.toString();
+                        cuView = image4;
+                        imageDataInt = image4.getId();
+                        url = image4url;
+                        name = "image4";
                     } else {
-                        Toast.makeText(ImageActivityPart4.this, "Upload Failed", Toast.LENGTH_SHORT).show();
+                        return;
                     }
+                    Picasso.get().load(url).into(cuView);
+                    FirebaseDatabase.getInstance().getReference().child("Users").child(firebaseUser.getUid())
+                            .child("imagesUser").child(name).setValue(url);
+                    FirebaseDatabase.getInstance().getReference().child("Images").child(firebaseUser.getUid()).child(name).setValue(url);
+                    pd.dismiss();
+
+                } else {
+                    Toast.makeText(ImageActivityPart4.this, "Upload Failed", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
@@ -251,15 +237,15 @@ public class ImageActivityPart4 extends AppCompatActivity {
         }
     }
 
-    private void getDetailsFromFirebase(){
+    private void getDetailsFromFirebase() {
 
 
         FirebaseDatabase.getInstance().getReference().child("Users").child(firebaseUser.getUid()).child("imagesUser").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.child("image1").exists()){
+                if (snapshot.child("image1").exists()) {
                     image1url = snapshot.child("image1").getValue().toString();
-                    Log.d("image1" , image1url +"");
+                    Log.d("image1", image1url + "");
                     Picasso.get().load(image1url).into(image1);
                 }
                 if (snapshot.child("image2").exists()) {
@@ -275,6 +261,7 @@ public class ImageActivityPart4 extends AppCompatActivity {
                     Picasso.get().load(image4url).into(image4);
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }

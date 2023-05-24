@@ -9,9 +9,9 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.prathamesh.matrimonyapp.R
-import com.prathamesh.matrimonyapp.model.userMessage
+import com.prathamesh.matrimonyapp.model.UserMessage
 
-class PsChatAdapter(private val mCOntext: Context, private val messageList: List<userMessage>) :
+class PsChatAdapter(private val mCOntext: Context, private val messageList: List<UserMessage>) :
     RecyclerView.Adapter<PsChatAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(mCOntext).inflate(R.layout.chatitemmessage, parent, false)

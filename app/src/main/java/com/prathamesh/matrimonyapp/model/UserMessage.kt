@@ -2,7 +2,7 @@ package com.prathamesh.matrimonyapp.model
 
 import java.util.Date
 
-class userMessage {
+class UserMessage {
     var message: String? = null
     var contex: String? = null
     var dateTime: String? = null

@@ -1,184 +1,149 @@
-package com.prathamesh.matrimonyapp;
+package com.prathamesh.matrimonyapp
 
-import android.content.Intent;
-import android.os.Bundle;
+import android.content.Intent
+import android.os.Bundle
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.prathamesh.matrimonyapp.adapter.ChatListAdapter
+import com.prathamesh.matrimonyapp.model.ChatUser
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+class ChatActivity : AppCompatActivity() {
+    private var bottomNavigationView: BottomNavigationView? = null
+    private var finalUsers = mutableListOf<ChatUser>()
+    private var chatListAdapter: ChatListAdapter? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_chat)
+        bottomNavigationView = findViewById(R.id.bottomNavigatorHome)
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.prathamesh.matrimonyapp.adapter.ChatListAdapter;
-import com.prathamesh.matrimonyapp.model.ChatUser;
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewChatList)
+        bottomNavigationView?.selectedItemId = R.id.nav_chat
+        bottomNavigationView?.setOnNavigationItemSelectedListener { item: MenuItem ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this@ChatActivity, HomeActivity::class.java))
+                    finish()
+                }
 
-import java.util.ArrayList;
-import java.util.List;
+                R.id.nav_profile -> {
+                    val intent = Intent(this@ChatActivity, ProfileActivity::class.java)
+                    intent.putExtra("profileID", FirebaseAuth.getInstance().currentUser!!.uid)
+                    intent.putExtra("UserPro", true)
+                    startActivity(intent)
+                    finish()
+                }
 
-public class ChatActivity extends AppCompatActivity {
+                R.id.nav_match -> {
+                    startActivity(Intent(this@ChatActivity, MatchActivity::class.java))
+                    finish()
+                }
 
-    BottomNavigationView bottomNavigationView;
-
-    private List<ChatUser> mUsers;
-    private List<ChatUser> finalUsers;
-    private List<ChatUser> matchUser;
-    private List<ChatUser> requestUsers;
-
-    private RecyclerView recyclerView;
-
-    private ChatListAdapter chatListAdapter;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
-
-        bottomNavigationView = findViewById(R.id.bottomNavigatorHome);
-
-        mUsers = new ArrayList<>();
-        finalUsers = new ArrayList<>();
-        matchUser = new ArrayList<>();
-        requestUsers = new ArrayList<>();
-
-        recyclerView = findViewById(R.id.recyclerViewChatList);
-
-        bottomNavigationView.setSelectedItemId(R.id.nav_chat);
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.nav_home:
-                    startActivity(new Intent(ChatActivity.this, HomeActivity.class));
-                    finish();
-                    break;
-                case R.id.nav_profile:
-                    Intent intent = new Intent(ChatActivity.this, ProfileActivity.class);
-                    intent.putExtra("profileID", FirebaseAuth.getInstance().getCurrentUser().getUid());
-                    intent.putExtra("UserPro", true);
-                    startActivity(intent);
-                    finish();
-                    break;
-                case R.id.nav_match:
-                    startActivity(new Intent(ChatActivity.this, MatchActivity.class));
-                    finish();
-                    break;
-                case R.id.nav_request:
-                    startActivity(new Intent(ChatActivity.this, RequestActivity.class));
-                    finish();
-                    break;
+                R.id.nav_request -> {
+                    startActivity(Intent(this@ChatActivity, RequestActivity::class.java))
+                    finish()
+                }
             }
-            return false;
-        });
-
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        chatListAdapter = new ChatListAdapter(this, finalUsers);
-        getUsers();
-        requestUser();
-        mainUser();
-        recyclerView.setAdapter(chatListAdapter);
-
+            false
+        }
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        chatListAdapter = ChatListAdapter(this, finalUsers)
+        users
+        requestUser()
+        mainUser()
+        recyclerView.adapter = chatListAdapter
     }
 
-    private void getUsers() {
-        FirebaseDatabase.getInstance().getReference().child("ChatUser")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("match").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+    private val users: Unit
+        get() {
+            FirebaseDatabase.getInstance().reference.child("ChatUser")
+                .child(FirebaseAuth.getInstance().currentUser!!.uid)
+                .child("match").addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.exists()) {
-                            matchUser.clear();
-                            for (DataSnapshot i : snapshot.getChildren()) {
+                            for (i in snapshot.children) {
                                 if (i.child("userId").exists()) {
-                                    ChatUser user = new ChatUser();
-                                    user.setmORr("m");
-                                    user.setUserId(i.child("userId").getValue().toString());
-                                    if (i.child("ImageUrl").exists())
-                                        user.setImageUrl(i.child("ImageUrl").getValue().toString());
-                                    if (i.child("name").exists())
-                                        user.setName(i.child("name").getValue().toString());
-                                    FirebaseDatabase.getInstance().getReference().child("ChatUser").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .child("common").child(user.getUserId()).setValue(user);
-                                }
-                            }
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
-    }
-
-    public void requestUser() {
-        FirebaseDatabase.getInstance().getReference().child("ChatUser")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("request").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            requestUsers.clear();
-                            for (DataSnapshot i : snapshot.getChildren()) {
-                                if (i.child("userId").exists()) {
-                                    ChatUser user = new ChatUser();
-                                    user.setmORr("m");
-                                    user.setUserId(i.child("userId").getValue().toString());
-                                    if (i.child("ImageUrl").exists())
-                                        user.setImageUrl(i.child("ImageUrl").getValue().toString());
-                                    if (i.child("name").exists())
-                                        user.setName(i.child("name").getValue().toString());
-                                    FirebaseDatabase.getInstance().getReference().child("ChatUser").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .child("common").child(user.getUserId()).setValue(user);
+                                    val user = ChatUser()
+                                    user.setmORr("m")
+                                    user.userId = i.child("userId").value.toString()
+                                    if (i.child("ImageUrl").exists()) user.imageUrl =
+                                        i.child("ImageUrl").value.toString()
+                                    if (i.child("name").exists()) user.name =
+                                        i.child("name").value.toString()
+                                    FirebaseDatabase.getInstance().reference.child("ChatUser")
+                                        .child(
+                                            FirebaseAuth.getInstance().currentUser!!.uid
+                                        )
+                                        .child("common").child(user.userId!!).setValue(user)
                                 }
                             }
                         }
                     }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    override fun onCancelled(error: DatabaseError) {}
+                })
+        }
 
-                    }
-                });
-    }
-
-    private void mainUser() {
-        FirebaseDatabase.getInstance().getReference().child("ChatUser")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("common").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            finalUsers.clear();
-                            for (DataSnapshot i : snapshot.getChildren()) {
-                                if (i.child("userId").exists()) {
-                                    ChatUser user = new ChatUser();
-                                    user.setmORr("m");
-                                    user.setUserId(i.child("userId").getValue().toString());
-                                    if (i.child("imageUrl").exists())
-                                        user.setImageUrl(i.child("imageUrl").getValue().toString());
-                                    if (i.child("name").exists())
-                                        user.setName(i.child("name").getValue().toString());
-                                    finalUsers.add(user);
-                                }
+    fun requestUser() {
+        FirebaseDatabase.getInstance().reference.child("ChatUser")
+            .child(FirebaseAuth.getInstance().currentUser!!.uid)
+            .child("request").addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        for (i in snapshot.children) {
+                            if (i.child("userId").exists()) {
+                                val user = ChatUser()
+                                user.setmORr("m")
+                                user.userId = i.child("userId").value.toString()
+                                if (i.child("ImageUrl").exists()) user.imageUrl =
+                                    i.child("ImageUrl").value.toString()
+                                if (i.child("name").exists()) user.name =
+                                    i.child("name").value.toString()
+                                FirebaseDatabase.getInstance().reference.child("ChatUser").child(
+                                    FirebaseAuth.getInstance().currentUser!!.uid
+                                )
+                                    .child("common").child(user.userId!!).setValue(user)
                             }
-                            chatListAdapter.notifyDataSetChanged();
-
                         }
                     }
+                }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                override fun onCancelled(error: DatabaseError) {}
+            })
+    }
 
+    private fun mainUser() {
+        FirebaseDatabase.getInstance().reference.child("ChatUser")
+            .child(FirebaseAuth.getInstance().currentUser!!.uid)
+            .child("common").addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        finalUsers.clear()
+                        for (i in snapshot.children) {
+                            if (i.child("userId").exists()) {
+                                val user = ChatUser()
+                                user.setmORr("m")
+                                user.userId = i.child("userId").value.toString()
+                                if (i.child("imageUrl").exists()) user.imageUrl =
+                                    i.child("imageUrl").value.toString()
+                                if (i.child("name").exists()) user.name =
+                                    i.child("name").value.toString()
+                                finalUsers.add(user)
+                            }
+                        }
+                        chatListAdapter?.notifyDataSetChanged()
                     }
-                });
+                }
 
+                override fun onCancelled(error: DatabaseError) {}
+            })
     }
 }
-

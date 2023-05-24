@@ -1,309 +1,263 @@
-package com.prathamesh.matrimonyapp;
+package com.prathamesh.matrimonyapp
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.RelativeLayout
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.prathamesh.matrimonyapp.adapter.SliderAdapter
+import com.prathamesh.matrimonyapp.model.SliderImages
+import com.prathamesh.matrimonyapp.model.User
+import com.smarteist.autoimageslider.SliderView
+import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
+import java.lang.Boolean
+import kotlin.Int
+import kotlin.String
+import kotlin.Unit
+import kotlin.plus
+import kotlin.toString
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.prathamesh.matrimonyapp.adapter.SliderAdapter;
-import com.prathamesh.matrimonyapp.model.SliderImages;
-import com.prathamesh.matrimonyapp.model.User;
-import com.smarteist.autoimageslider.SliderView;
-import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-
-public class ProfileActivity extends AppCompatActivity {
-
-
-    private List<SliderImages> mImages;
-    private SliderView sliderImages;
-    private SliderAdapter sliderAdapter;
-
-
-
-
-    private RelativeLayout setting;
-    private BottomNavigationView bottomNavigationView;
-    private Bundle bundle;
-    private String profileID;
-
-    private Button editProfile;
-    private Button logOut;
-    private User userDe;
-
-    private String hobbies;
-
-    private CircleImageView dp;
-    private TextView name;
-    private TextView gender;
-    private TextView profession;
-    private TextView birthDate;
-    private TextView age;
-    private TextView bio;
-    private TextView number;
-    private TextView emailId;
-    private TextView marriageStatus;
-    private TextView hobby;
-    private TextView adress;
-
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
-
-        mImages = new ArrayList<>();
-        sliderImages = findViewById(R.id.slider);
-        profileID = FirebaseAuth.getInstance().getUid();
-
-        bundle = getIntent().getExtras();
-        if (bundle.getBoolean("OtherProfile", false )) {
-            profileID = bundle.getString("profileId");
+class ProfileActivity : AppCompatActivity() {
+    private var mImages = mutableListOf<SliderImages>()
+    private var sliderImages: SliderView? = null
+    private var sliderAdapter: SliderAdapter? = null
+    private var setting: RelativeLayout? = null
+    private var bottomNavigationView: BottomNavigationView? = null
+    private var bundle: Bundle? = null
+    private var profileID: String? = null
+    private var editProfile: Button? = null
+    private var logOut: Button? = null
+    private var userDe: User? = null
+    private var hobbies: String? = null
+    private var dp: CircleImageView? = null
+    private var name: TextView? = null
+    private var gender: TextView? = null
+    private var profession: TextView? = null
+    private var birthDate: TextView? = null
+    private var age: TextView? = null
+    private var bio: TextView? = null
+    private var number: TextView? = null
+    private var emailId: TextView? = null
+    private var marriageStatus: TextView? = null
+    private var hobby: TextView? = null
+    private var adress: TextView? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_profile)
+        mImages = ArrayList()
+        sliderImages = findViewById(R.id.slider)
+        profileID = FirebaseAuth.getInstance().uid
+        bundle = intent.extras
+        if (bundle!!.getBoolean("OtherProfile", false)) {
+            profileID = bundle!!.getString("profileId")
         }
-
-
-        editProfile = findViewById(R.id.editProfile);
-        logOut = findViewById(R.id.logOutButton);
-        hobby = findViewById(R.id.hobbyProfile);
-        dp = findViewById(R.id.profileImageUser);
-        name = findViewById(R.id.usernameProfile);
-        gender = findViewById(R.id.genderProfile);
-        profession = findViewById(R.id.professionProfile);
-        birthDate = findViewById(R.id.birthdate);
-        bio = findViewById(R.id.bioProfile);
-        age = findViewById(R.id.age);
-        number = findViewById(R.id.numberUser);
-        emailId = findViewById(R.id.emailUser);
-        marriageStatus = findViewById(R.id.marriedSttus);
-        adress = findViewById(R.id.adressUser);
-
-
-        bottomNavigationView = findViewById(R.id.bottomNavigatorHome);
-        setting = findViewById(R.id.userSettings);
-        userDe = new User();
-
-
-
-        bottomNavigationView.setSelectedItemId(R.id.nav_profile);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.nav_chat:
-                        startActivity(new Intent(ProfileActivity.this , ChatActivity.class));
-                        finish();
-                        break;
-                    case R.id.nav_match:
-                        Intent intent = new Intent(ProfileActivity.this , MatchActivity.class);
-//                        intent.putExtra("profileID" , FirebaseAuth.getInstance().getCurrentUser().getUid());
-//                        intent.putExtra("UserPro" , true);
-                        startActivity(intent);
-                        finish();
-                        break;
-                    case R.id.nav_home:
-                        startActivity(new Intent(ProfileActivity.this , HomeActivity.class));
-                        finish();
-                        break;
-                    case R.id.nav_request:
-                        startActivity(new Intent(ProfileActivity.this , RequestActivity.class));
-                        finish();
-                        break;
+        editProfile = findViewById(R.id.editProfile)
+        logOut = findViewById(R.id.logOutButton)
+        hobby = findViewById(R.id.hobbyProfile)
+        dp = findViewById(R.id.profileImageUser)
+        name = findViewById(R.id.usernameProfile)
+        gender = findViewById(R.id.genderProfile)
+        profession = findViewById(R.id.professionProfile)
+        birthDate = findViewById(R.id.birthdate)
+        bio = findViewById(R.id.bioProfile)
+        age = findViewById(R.id.age)
+        number = findViewById(R.id.numberUser)
+        emailId = findViewById(R.id.emailUser)
+        marriageStatus = findViewById(R.id.marriedSttus)
+        adress = findViewById(R.id.adressUser)
+        bottomNavigationView = findViewById(R.id.bottomNavigatorHome)
+        setting = findViewById(R.id.userSettings)
+        userDe = User()
+        bottomNavigationView?.selectedItemId = R.id.nav_profile
+        bottomNavigationView?.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_chat -> {
+                    startActivity(Intent(this@ProfileActivity, ChatActivity::class.java))
+                    finish()
                 }
-                return false;
+
+                R.id.nav_match -> {
+                    val intent = Intent(this@ProfileActivity, MatchActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+
+                R.id.nav_home -> {
+                    startActivity(Intent(this@ProfileActivity, HomeActivity::class.java))
+                    finish()
+                }
+
+                R.id.nav_request -> {
+                    startActivity(Intent(this@ProfileActivity, RequestActivity::class.java))
+                    finish()
+                }
             }
-        });
-
-        if (profileID != null){
-            if(profileID.equals(FirebaseAuth.getInstance().getUid())){
-                setting.setVisibility(View.VISIBLE);
-                logOut.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        FirebaseAuth.getInstance().signOut();
-                        startActivity(new Intent(ProfileActivity.this, SplashActivity.class));
-                        finish();
-                    }
-                });
-                editProfile.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startActivity(new Intent(ProfileActivity.this, CreateActivityPart2.class));
-                        finish();
-                    }
-                });
-
-            }else {
-                setting.setVisibility(View.GONE);
+            false
+        }
+        if (profileID != null) {
+            if (profileID == FirebaseAuth.getInstance().uid) {
+                setting?.visibility = View.VISIBLE
+                logOut?.setOnClickListener {
+                    FirebaseAuth.getInstance().signOut()
+                    startActivity(Intent(this@ProfileActivity, SplashActivity::class.java))
+                    finish()
+                }
+                editProfile?.setOnClickListener {
+                    startActivity(Intent(this@ProfileActivity, CreateActivityPart2::class.java))
+                    finish()
+                }
+            } else {
+                setting?.visibility = View.GONE
             }
         }
-
-        getImagesFromFireBase();
-        sliderAdapter = new SliderAdapter(mImages , ProfileActivity.this);
-        sliderImages.setAutoCycleDirection(SliderView.LAYOUT_DIRECTION_LTR);
-
-        sliderImages.setScrollTimeInSec(3);
-        sliderImages.setAutoCycle(true);
-        sliderImages.startAutoCycle();
-
-        sliderImages.setSliderAdapter(sliderAdapter);
-
-
-        getDataFromFireBase();
-        getHobbies();
-
+        imagesFromFireBase
+        sliderAdapter = SliderAdapter(mImages, this@ProfileActivity)
+        sliderImages?.autoCycleDirection = SliderView.LAYOUT_DIRECTION_LTR
+        sliderImages?.scrollTimeInSec = 3
+        sliderImages?.isAutoCycle = true
+        sliderImages?.startAutoCycle()
+        sliderImages?.setSliderAdapter(sliderAdapter!!)
+        dataFromFireBase
+        getHobbies()
     }
 
-    private void getImagesFromFireBase(){
-        FirebaseDatabase.getInstance().getReference().child("Users").child(profileID).child("imagesUser").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                mImages.clear();
-                if (snapshot.child("image1").exists()){
-                    mImages.add(new SliderImages(snapshot.child("image1").getValue().toString()));
-                }else {
-                    mImages.add(new SliderImages("https://firebasestorage.googleapis.com/v0/b/matrimony-app-6da14.appspot.com/o/default%2FNoneImages.jpg?alt=media&token=0edb6fb9-6dca-4616-9ec2-b437e1fb0f4a"));
-                }
-                if (snapshot.child("image2").exists()) {
-                    mImages.add(new SliderImages(snapshot.child("image2").getValue().toString()));
-                }
-                if (snapshot.child("image3").exists()) {
-                    mImages.add(new SliderImages(snapshot.child("image3").getValue().toString()));
-                }
-                if (snapshot.child("image4").exists()) {
-                    mImages.add(new SliderImages(snapshot.child("image4").getValue().toString()));
-                }
-                sliderAdapter.notifyDataSetChanged();
-            }
-
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    private void getDataFromFireBase(){
-
-        FirebaseDatabase.getInstance().getReference().child("Users").child(profileID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.child("userID").exists()) {
-                    userDe.setUserID(snapshot.child("userID").getValue().toString());
-                }
-                if (snapshot.child("email").exists()) {
-                    userDe.setEmail(snapshot.child("email").getValue().toString());
-                    emailId.setText("EMAIL : " + userDe.getEmail());
-                }
-                if (snapshot.child("password").exists()) {
-                    userDe.setPassword(snapshot.child("password").getValue().toString());
-                }
-                if (snapshot.child("imageUrl").exists()){
-                    userDe.setImageUrl(snapshot.child("imageUrl").getValue().toString());
-                    Picasso.get().load(userDe.getImageUrl()).into(dp);
-                }
-                if (snapshot.child("adress").exists()) {
-                    userDe.setAdress(snapshot.child("adress").getValue().toString());
-                    adress.setText("ADRESS : " + userDe.getAdress());
-                }
-                if (snapshot.child("fullName").exists()) {
-                    userDe.setFullName(snapshot.child("fullName").getValue().toString());
-                    name.setText(userDe.getFullName());
-                }
-                if (snapshot.child("profession").exists()) {
-                    userDe.setProfession(snapshot.child("profession").getValue().toString());
-                    profession.setText("POFESSION : " + userDe.getProfession());
-                }
-                if (snapshot.child("birthDate").exists()) {
-                    userDe.setBirthDate(snapshot.child("birthDate").getValue().toString());
-                    birthDate.setText("BIRTHDATE : " + userDe.getBirthDate());
-                }
-                if (snapshot.child("age").exists()) {
-                    userDe.setAge(Integer.parseInt(snapshot.child("age").getValue().toString()));
-                    age.setText("AGE : " + userDe.getAge());
-                }
-                if (snapshot.child("gender").exists()) {
-                    userDe.setGender(snapshot.child("gender").getValue().toString());
-                    if (userDe.getGender().equals("male")){
-                        gender.setText("Gender : MALE");
-                    }else if(userDe.getUserID().equals("female")) {
-                        gender.setText("Gender : FEMALE");
+    private val imagesFromFireBase: Unit
+        get() {
+            FirebaseDatabase.getInstance().reference.child("Users").child(profileID!!)
+                .child("imagesUser").addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        mImages.clear()
+                        if (snapshot.child("image1").exists()) {
+                            mImages.add(SliderImages(snapshot.child("image1").value.toString()))
+                        } else {
+                            mImages.add(SliderImages("https://firebasestorage.googleapis.com/v0/b/matrimony-app-6da14.appspot.com/o/default%2FNoneImages.jpg?alt=media&token=0edb6fb9-6dca-4616-9ec2-b437e1fb0f4a"))
+                        }
+                        if (snapshot.child("image2").exists()) {
+                            mImages.add(SliderImages(snapshot.child("image2").value.toString()))
+                        }
+                        if (snapshot.child("image3").exists()) {
+                            mImages.add(SliderImages(snapshot.child("image3").value.toString()))
+                        }
+                        if (snapshot.child("image4").exists()) {
+                            mImages.add(SliderImages(snapshot.child("image4").value.toString()))
+                        }
+                        sliderAdapter!!.notifyDataSetChanged()
                     }
-                }
-                if (snapshot.child("number").exists()) {
-                    userDe.setNumber(snapshot.child("number").getValue().toString());
-                    number.setText("NUMBER : " + userDe.getNumber());
-                }
-                if (snapshot.child("bio").exists()) {
-                    userDe.setBio(snapshot.child("bio").getValue().toString());
-                    bio.setText("Hello! I am " + userDe.getFullName() + "\n" + userDe.getBio());
-                }
-                if (snapshot.child("isMarried").exists()) {
-                    Boolean b = Boolean.parseBoolean(snapshot.child("isMarried").getValue().toString());
-                    userDe.setMarried(b);
-                    if (userDe.isMarried() == true){
-                        marriageStatus.setText("MARTIAL STATUS : MARRIED ");
-                    }else {
-                        marriageStatus.setText("MARTIAL STATUS : UNMARRIED ");
+
+                    override fun onCancelled(error: DatabaseError) {}
+                })
+        }
+    private val dataFromFireBase: Unit
+        get() {
+            FirebaseDatabase.getInstance().reference.child("Users").child(profileID!!)
+                .addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.child("userID").exists()) {
+                            userDe!!.userID = snapshot.child("userID").value.toString()
+                        }
+                        if (snapshot.child("email").exists()) {
+                            userDe!!.email = snapshot.child("email").value.toString()
+                            emailId!!.text = "EMAIL : " + userDe!!.email
+                        }
+                        if (snapshot.child("password").exists()) {
+                            userDe!!.password = snapshot.child("password").value.toString()
+                        }
+                        if (snapshot.child("imageUrl").exists()) {
+                            userDe!!.imageUrl = snapshot.child("imageUrl").value.toString()
+                            Picasso.get().load(userDe!!.imageUrl).into(dp)
+                        }
+                        if (snapshot.child("adress").exists()) {
+                            userDe!!.adress = snapshot.child("adress").value.toString()
+                            adress!!.text = "ADRESS : " + userDe!!.adress
+                        }
+                        if (snapshot.child("fullName").exists()) {
+                            userDe!!.fullName = snapshot.child("fullName").value.toString()
+                            name!!.text = userDe!!.fullName
+                        }
+                        if (snapshot.child("profession").exists()) {
+                            userDe!!.profession = snapshot.child("profession").value.toString()
+                            profession!!.text = "POFESSION : " + userDe!!.profession
+                        }
+                        if (snapshot.child("birthDate").exists()) {
+                            userDe!!.birthDate = snapshot.child("birthDate").value.toString()
+                            birthDate!!.text = "BIRTHDATE : " + userDe!!.birthDate
+                        }
+                        if (snapshot.child("age").exists()) {
+                            userDe!!.age = snapshot.child("age").value.toString().toInt()
+                            age!!.text = "AGE : " + userDe!!.age
+                        }
+                        if (snapshot.child("gender").exists()) {
+                            userDe!!.gender = snapshot.child("gender").value.toString()
+                            if (userDe!!.gender == "male") {
+                                gender!!.text = "Gender : MALE"
+                            } else if (userDe!!.userID == "female") {
+                                gender!!.text = "Gender : FEMALE"
+                            }
+                        }
+                        if (snapshot.child("number").exists()) {
+                            userDe!!.number = snapshot.child("number").value.toString()
+                            number!!.text = "NUMBER : " + userDe!!.number
+                        }
+                        if (snapshot.child("bio").exists()) {
+                            userDe!!.bio = snapshot.child("bio").value.toString()
+                            bio!!.text = """
+                        Hello! I am ${userDe!!.fullName}
+                        ${userDe!!.bio}
+                        """.trimIndent()
+                        }
+                        if (snapshot.child("isMarried").exists()) {
+                            val b =
+                                Boolean.parseBoolean(snapshot.child("isMarried").value.toString())
+                            userDe!!.isMarried = b
+                            if (userDe!!.isMarried == true) {
+                                marriageStatus!!.text = "MARTIAL STATUS : MARRIED "
+                            } else {
+                                marriageStatus!!.text = "MARTIAL STATUS : UNMARRIED "
+                            }
+                        }
+                        val imageUrl: MutableList<String> = ArrayList()
+                        if (snapshot.child("imagesUser").exists()) {
+                            for (i in snapshot.child("imagesUser").children) {
+                                imageUrl.add(i.value.toString())
+                            }
+                            userDe!!.imagesUser = imageUrl
+                        }
+                        val hobId: MutableList<Int> = ArrayList()
+                        if (snapshot.child("hobbies").exists()) {
+                            for (i in snapshot.child("hobbies").children) {
+                                hobId.add(i.key.toString().toInt())
+                            }
+                            userDe!!.hobbies = hobId
+                        }
                     }
-                }
-                List <String> imageUrl = new ArrayList<>();
-                if (snapshot.child("imagesUser").exists()){
-                    for(DataSnapshot i : snapshot.child("imagesUser").getChildren()){
-                        imageUrl.add(i.getValue().toString());
+
+                    override fun onCancelled(error: DatabaseError) {}
+                })
+        }
+
+    private fun getHobbies() {
+        hobbies = ""
+        FirebaseDatabase.getInstance().reference.child("Hobbies")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (i in snapshot.children) {
+                        if (i.child(profileID!!).exists()) {
+                            hobbies = hobbies + i.key.toString() + "   "
+                        }
                     }
-                    userDe.setImagesUser(imageUrl);
+                    hobby!!.text = hobbies!!.trim { it <= ' ' }
                 }
-                List <Integer> hobId = new ArrayList<>();
-                if (snapshot.child("hobbies").exists()){
-                    for(DataSnapshot i : snapshot.child("hobbies").getChildren()){
-                        hobId.add(Integer.parseInt(i.getKey().toString()));
-                    }
-                    userDe.setHobbies(hobId);
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    private void getHobbies(){
-        hobbies = "";
-        FirebaseDatabase.getInstance().getReference().child("Hobbies").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot i : snapshot.getChildren()){
-                    if(i.child(profileID).exists()){
-                        hobbies = hobbies + i.getKey().toString() + "   ";
-                    }
-                }
-                hobby.setText(hobbies.trim());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+                override fun onCancelled(error: DatabaseError) {}
+            })
     }
 }

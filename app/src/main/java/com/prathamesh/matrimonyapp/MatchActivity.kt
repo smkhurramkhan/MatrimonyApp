@@ -1,60 +1,38 @@
-package com.prathamesh.matrimonyapp;
+package com.prathamesh.matrimonyapp
 
-import android.os.Bundle;
+import android.os.Bundle
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.prathamesh.matrimonyapp.fragments.ChatFragment
+import com.prathamesh.matrimonyapp.fragments.HomeFragment
+import com.prathamesh.matrimonyapp.fragments.MatchFragment
+import com.prathamesh.matrimonyapp.fragments.ProfileFragment
+import com.prathamesh.matrimonyapp.fragments.RequestFragment
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.prathamesh.matrimonyapp.fragments.ChatFragment;
-import com.prathamesh.matrimonyapp.fragments.HomeFragment;
-import com.prathamesh.matrimonyapp.fragments.MatchFragment;
-import com.prathamesh.matrimonyapp.fragments.ProfileFragment;
-import com.prathamesh.matrimonyapp.fragments.RequestFragment;
-
-public class MatchActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_match);
-
-
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigatorHome);
-
-        bottomNavigationView.setSelectedItemId(R.id.nav_match);
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.nav_chat:
-                    loadFragment(new ChatFragment(), "chatFragment");
-                    break;
-                case R.id.nav_profile:
-                    loadFragment(new ProfileFragment(), "profileFragment");
-                    break;
-                case R.id.nav_home:
-                    loadFragment(new HomeFragment(), "homeFragment");
-                    break;
-                case R.id.nav_request:
-                    loadFragment(new RequestFragment(), "requestFragment");
-                    break;
-
-                case R.id.nav_match:
-                    loadFragment(new MatchFragment(), "matchFragment");
-                    break;
+class MatchActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_match)
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigatorHome)
+        bottomNavigationView.selectedItemId = R.id.nav_match
+        bottomNavigationView.setOnNavigationItemSelectedListener { item: MenuItem ->
+            when (item.itemId) {
+                R.id.nav_chat -> loadFragment(ChatFragment(), "chatFragment")
+                R.id.nav_profile -> loadFragment(ProfileFragment(), "profileFragment")
+                R.id.nav_home -> loadFragment(HomeFragment(), "homeFragment")
+                R.id.nav_request -> loadFragment(RequestFragment(), "requestFragment")
+                R.id.nav_match -> loadFragment(MatchFragment(), "matchFragment")
             }
-            return false;
-        });
-
-
+            false
+        }
     }
 
-
-    private void loadFragment(Fragment fragment, String tag) {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.container, fragment, tag);
-        transaction.commit();
+    private fun loadFragment(fragment: Fragment, tag: String) {
+        val fm = supportFragmentManager
+        val transaction = fm.beginTransaction()
+        transaction.replace(R.id.container, fragment, tag)
+        transaction.commit()
     }
 }

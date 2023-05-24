@@ -1,193 +1,145 @@
-package com.prathamesh.matrimonyapp;
+package com.prathamesh.matrimonyapp
 
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.os.Bundle
+import android.util.Log
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.prathamesh.matrimonyapp.adapter.PsChatAdapter
+import com.prathamesh.matrimonyapp.model.UserMessage
+import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Date
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+class PersonalChatAC : AppCompatActivity() {
+    private var mUsers = mutableListOf<UserMessage>()
+    private var adapter: PsChatAdapter? = null
+    private var profileUser: CircleImageView? = null
+    private var nameUser: TextView? = null
+    private var profileCuUser: CircleImageView? = null
+    private var userMessage: EditText? = null
+    private var profileId: String? = null
+    private var userId: String? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_personal_chat)
+        val bundle = intent.extras
+        profileId = FirebaseAuth.getInstance().currentUser!!.uid
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewChat)
+        profileUser = findViewById(R.id.dpChatList)
+        nameUser = findViewById(R.id.name)
+        profileCuUser = findViewById(R.id.dpUserChatList)
+        userMessage = findViewById(R.id.userMessage)
+        val sendMessage = findViewById<ImageView>(R.id.sendMessage)
+        mUsers = ArrayList()
+        if (bundle!!.getBoolean("ChatUser", false)) {
+            userId = bundle.getString("chatUserId")
+        }
+        recyclerView.setHasFixedSize(true)
+        val l = LinearLayoutManager(this)
+        l.stackFromEnd = true
+        l.reverseLayout = false
+        recyclerView.layoutManager = l
+        adapter = PsChatAdapter(this, mUsers)
+        recyclerView.adapter = adapter
+        userData
+        messages
+        sendMessage.setOnClickListener {
+            if (userMessage?.text.toString().isEmpty()) {
+                userMessage?.error = "Cannot Send Empty messages"
+            } else {
+                val date = SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(Date()) + ""
+                FirebaseDatabase.getInstance().reference.child("Chats").child(profileId!!)
+                    .child(userId!!).child(date)
+                    .child("contex").setValue("send")
+                FirebaseDatabase.getInstance().reference.child("Chats").child(profileId!!)
+                    .child(userId!!).child(date)
+                    .child("message").setValue(userMessage?.text.toString().trim { it <= ' ' })
+                FirebaseDatabase.getInstance().reference.child("Chats").child(userId!!).child(
+                    profileId!!
+                ).child(date)
+                    .child("contex").setValue("recevied")
+                FirebaseDatabase.getInstance().reference.child("Chats").child(userId!!).child(
+                    profileId!!
+                ).child(date)
+                    .child("message").setValue(userMessage?.text.toString().trim { it <= ' ' })
+                userMessage?.setText("")
+            }
+        }
+    }
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.prathamesh.matrimonyapp.adapter.PsChatAdapter;
-import com.prathamesh.matrimonyapp.model.userMessage;
-import com.squareup.picasso.Picasso;
+    private val userData: Unit
+        get() {
+            FirebaseDatabase.getInstance().reference.child("Users").child(userId!!)
+                .addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        nameUser!!.text = snapshot.child("fullName").value.toString()
+                        Picasso.get().load(snapshot.child("imageUrl").value.toString())
+                            .into(profileUser)
+                    }
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+                    override fun onCancelled(error: DatabaseError) {}
+                })
+            FirebaseDatabase.getInstance().reference.child("Users").child(profileId!!)
+                .addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        Picasso.get().load(snapshot.child("imageUrl").value.toString())
+                            .into(profileCuUser)
+                    }
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
-public class PersonalChatAC extends AppCompatActivity {
-
-    private RecyclerView recyclerView;
-    private List<userMessage> mUsers;
-    private PsChatAdapter adapter;
-
-
-    private CircleImageView profileUser;
-    private TextView nameUser;
-    private CircleImageView profileCuUser;
-    private EditText userMessage;
-    private ImageView sendMessage;
-
-    private Bundle bundle;
-
-    private String profileId;
-    private String userId;
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_personal_chat);
-
-
-        bundle = getIntent().getExtras();
-        profileId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        recyclerView = findViewById(R.id.recyclerViewChat);
-        profileUser = findViewById(R.id.dpChatList);
-        nameUser = findViewById(R.id.name);
-        profileCuUser = findViewById(R.id.dpUserChatList);
-        userMessage = findViewById(R.id.userMessage);
-        sendMessage = findViewById(R.id.sendMessage);
-
-        mUsers = new ArrayList<>();
-
-        if (bundle.getBoolean("ChatUser", false)) {
-            userId = bundle.getString("chatUserId");
+                    override fun onCancelled(error: DatabaseError) {}
+                })
         }
 
-        recyclerView.setHasFixedSize(true);
-        LinearLayoutManager l = new LinearLayoutManager(this);
-        l.setStackFromEnd(true);
-        l.setReverseLayout(false);
-        recyclerView.setLayoutManager(l);
-        adapter = new PsChatAdapter(this, mUsers);
-        recyclerView.setAdapter(adapter);
 
-
-        getUserData();
-        getMessages();
-
-
-        sendMessage.setOnClickListener(view -> {
-
-            if (userMessage.getText().toString().isEmpty()) {
-                userMessage.setError("Cannot Send Empty messages");
-            } else {
-                String date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()) + "";
-                FirebaseDatabase.getInstance().getReference().child("Chats").child(profileId).child(userId).child(date)
-                        .child("contex").setValue("send");
-                FirebaseDatabase.getInstance().getReference().child("Chats").child(profileId).child(userId).child(date)
-                        .child("message").setValue(userMessage.getText().toString().trim());
-
-                FirebaseDatabase.getInstance().getReference().child("Chats").child(userId).child(profileId).child(date)
-                        .child("contex").setValue("recevied");
-                FirebaseDatabase.getInstance().getReference().child("Chats").child(userId).child(profileId).child(date)
-                        .child("message").setValue(userMessage.getText().toString().trim());
-                userMessage.setText("");
-            }
-        });
-
-    }
-
-    private void getUserData() {
-        FirebaseDatabase.getInstance().getReference().child("Users").child(userId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                nameUser.setText(snapshot.child("fullName").getValue().toString());
-                Picasso.get().load(snapshot.child("imageUrl").getValue().toString()).into(profileUser);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        FirebaseDatabase.getInstance().getReference().child("Users").child(profileId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Picasso.get().load(snapshot.child("imageUrl").getValue().toString()).into(profileCuUser);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    private void getMessages() {
-
-//        FirebaseDatabase.getInstance().getReference().child("Chats").child(profileId).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-////                String dateTime;
-////                for (DataSnapshot i : snapshot.getChildren()){
-////                    dateTime = i.getKey().toString() + "/";
-////                    for (DataSnapshot j : i.getChildren()){
-////                        dateTime = dateTime + j.getKey().toString() + "/";
-////                        for (DataSnapshot k : j.getChildren()){
-////                            dateTime = dateTime + k.getKey().toString();
-////                        }
-////                    }
-////                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-
-        FirebaseDatabase.getInstance().getReference().child("Chats").child(profileId).child(userId).orderByKey().addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot datasnapshot) {
-                mUsers.clear();
-                for (DataSnapshot snapshot : datasnapshot.getChildren()) {
-                    if (snapshot.exists()) {
-                        String date = snapshot.getKey().toString();
-                        userMessage message = new userMessage();
-                        if (snapshot.child("contex").exists()) {
-                            message.setContex(snapshot.child("contex").getValue().toString());
-                            Log.d("NamePratham", message.getContex());
+    private val messages: Unit
+        get() {
+            FirebaseDatabase.getInstance().reference.child("Chats").child(profileId!!).child(
+                userId!!
+            ).orderByKey().addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(datasnapshot: DataSnapshot) {
+                    mUsers.clear()
+                    for (snapshot in datasnapshot.children) {
+                        if (snapshot.exists()) {
+                            val date = snapshot.key.toString()
+                            val message = UserMessage()
+                            if (snapshot.child("contex").exists()) {
+                                message.contex = snapshot.child("contex").value.toString()
+                                Log.d("NamePratham", message.contex!!)
+                            }
+                            if (snapshot.child("message").exists()) {
+                                message.message = snapshot.child("message").value.toString()
+                                Log.d("NamePratham", message.message!!)
+                            }
+                            message.dateTime = date
+                            Log.d("NamePratham", date)
+                            try {
+                                message.dateTimeFormat =
+                                    SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse(date)
+                            } catch (e: ParseException) {
+                                e.printStackTrace()
+                            }
+                            if (message.dateTimeFormat != null) Log.d(
+                                "NamePratham",
+                                message.dateTimeFormat.toString()
+                            )
+                            mUsers.add(message)
                         }
-                        if (snapshot.child("message").exists()) {
-                            message.setMessage(snapshot.child("message").getValue().toString());
-                            Log.d("NamePratham", message.getMessage());
-                        }
-                        message.setDateTime(date);
-                        Log.d("NamePratham", date);
-                        try {
-                            message.setDateTimeFormat(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse(date));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                        if (message.getDateTimeFormat() != null)
-                            Log.d("NamePratham", message.getDateTimeFormat().toString());
-
-                        mUsers.add(message);
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        adapter.notifyDataSetChanged();
-
-    }
+                override fun onCancelled(error: DatabaseError) {}
+            })
+            adapter?.notifyDataSetChanged()
+        }
 }
