@@ -18,12 +18,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.prathamesh.matrimonyapp.Adapter.HomeItemAdapter;
+import com.prathamesh.matrimonyapp.adapter.HomeItemAdapter;
 import com.prathamesh.matrimonyapp.Model.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class RequestActivity extends AppCompatActivity {
 

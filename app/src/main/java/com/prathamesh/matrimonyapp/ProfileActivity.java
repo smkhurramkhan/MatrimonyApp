@@ -17,7 +17,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.prathamesh.matrimonyapp.Adapter.SliderAdapter;
+import com.prathamesh.matrimonyapp.adapter.SliderAdapter;
 import com.prathamesh.matrimonyapp.Model.SliderImages;
 import com.prathamesh.matrimonyapp.Model.User;
 import com.smarteist.autoimageslider.SliderView;

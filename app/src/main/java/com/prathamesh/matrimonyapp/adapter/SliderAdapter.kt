@@ -1,60 +1,35 @@
-package com.prathamesh.matrimonyapp.Adapter;
+package com.prathamesh.matrimonyapp.adapter
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import com.bumptech.glide.Glide
+import com.prathamesh.matrimonyapp.Model.SliderImages
+import com.prathamesh.matrimonyapp.R
+import com.smarteist.autoimageslider.SliderViewAdapter
 
-import androidx.appcompat.view.menu.MenuView;
-
-import com.bumptech.glide.Glide;
-import com.prathamesh.matrimonyapp.Model.SliderImages;
-import com.prathamesh.matrimonyapp.R;
-import com.smarteist.autoimageslider.SliderViewAdapter;
-
-import java.util.List;
-
-public class SliderAdapter extends SliderViewAdapter<SliderAdapter.ViewHolder>{
-
-    private List<SliderImages> imageUrl;
-    private Context mCOntext;
-    private String url = null;
-
-    public SliderAdapter(List<SliderImages> imageUrl, Context mCOntext) {
-        this.imageUrl = imageUrl;
-        this.mCOntext = mCOntext;
+class SliderAdapter(private val imageUrl: List<SliderImages>, private val mCOntext: Context) :
+    SliderViewAdapter<SliderAdapter.ViewHolder>() {
+    private val url: String? = null
+    override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
+        val inflate = LayoutInflater.from(parent.context).inflate(R.layout.sliderlayoutitem, null)
+        return ViewHolder(inflate)
     }
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.sliderlayoutitem, null);
-        return new ViewHolder(inflate);
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+        val sliderItem = imageUrl[position]
+        Glide.with(viewHolder.itemView).load(sliderItem.imgUrl).fitCenter()
+            .into(viewHolder.image)
     }
 
-    @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        SliderImages sliderItem = imageUrl.get(position);
-
-        Glide.with(viewHolder.itemView).load(sliderItem.getImgUrl()).fitCenter()
-                .into(viewHolder.image);
-
+    override fun getCount(): Int {
+        return imageUrl.size
     }
 
-    @Override
-    public int getCount() {
-        return imageUrl.size();
-    }
+    inner class ViewHolder(itemView: View) : SliderViewAdapter.ViewHolder(itemView) {
+        var image: ImageView = itemView.findViewById(R.id.myimage)
 
-    public class ViewHolder extends SliderViewAdapter.ViewHolder{
-
-        public View itemView;
-        public ImageView image;
-        public ViewHolder(View itemView) {
-            super(itemView);
-
-            this.itemView = itemView;
-            image = itemView.findViewById(R.id.myimage);
-        }
     }
 }

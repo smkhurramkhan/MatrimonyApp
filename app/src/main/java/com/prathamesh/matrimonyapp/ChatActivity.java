@@ -14,7 +14,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.prathamesh.matrimonyapp.Adapter.ChatListAdapter;
+import com.prathamesh.matrimonyapp.adapter.ChatListAdapter;
 import com.prathamesh.matrimonyapp.Model.ChatUser;
 
 import java.util.ArrayList;

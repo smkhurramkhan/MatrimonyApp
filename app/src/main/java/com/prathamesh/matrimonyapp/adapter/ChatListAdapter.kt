@@ -1,99 +1,67 @@
-package com.prathamesh.matrimonyapp.Adapter;
+package com.prathamesh.matrimonyapp.adapter
 
-import android.content.Context;
-import android.content.Intent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
+import android.content.Context
+import android.content.Intent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.prathamesh.matrimonyapp.Model.ChatUser
+import com.prathamesh.matrimonyapp.PersonalChatAC
+import com.prathamesh.matrimonyapp.R
+import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.prathamesh.matrimonyapp.Model.ChatUser;
-import com.prathamesh.matrimonyapp.PersonalChatAC;
-import com.prathamesh.matrimonyapp.R;
-import com.squareup.picasso.Picasso;
-
-import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-
-public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHolder> {
-
-    public Context mContext;
-    public List<ChatUser> mUser;
-
-    public ChatListAdapter(Context mContext, List<ChatUser> mUser) {
-        this.mContext = mContext;
-        this.mUser = mUser;
+class ChatListAdapter(var mContext: Context, var mUser: List<ChatUser>) :
+    RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(mContext).inflate(R.layout.chat_activity_item, parent, false)
+        return ViewHolder(view)
     }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.chat_activity_item, parent, false);
-        return new ChatListAdapter.ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
-        ChatUser user = mUser.get(position);
-
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val user = mUser[position]
         if (user != null) {
-            Picasso.get().load(user.getImageUrl()).into(holder.image);
-
-            holder.nameChat.setText(user.getName());
-
-            if (user.getmORr().equals("m")) {
-                holder.context.setText("Matched User");
+            Picasso.get().load(user.imageUrl).into(holder.image)
+            holder.nameChat.text = user.name
+            if (user.getmORr() == "m") {
+                holder.context.text = "Matched User"
             } else {
-                holder.context.setText("Requested User");
+                holder.context.text = "Requested User"
             }
-
-            holder.delete.setOnClickListener(view -> {
-
-            });
-
-            holder.itemView.setOnClickListener(view -> {
-                Intent intent = new Intent(mContext, PersonalChatAC.class);
-                intent.putExtra("ChatUser", true);
-                intent.putExtra("chatUserId", user.getUserId());
-                mContext.startActivity(intent);
-            });
-
-            holder.nameChat.setOnClickListener(view -> {
-                Intent intent = new Intent(mContext, PersonalChatAC.class);
-                intent.putExtra("ChatUser", true);
-                intent.putExtra("chatUserId", user.getUserId());
-                mContext.startActivity(intent);
-            });
+            holder.delete.setOnClickListener { view: View? -> }
+            holder.itemView.setOnClickListener { view: View? ->
+                val intent = Intent(mContext, PersonalChatAC::class.java)
+                intent.putExtra("ChatUser", true)
+                intent.putExtra("chatUserId", user.userId)
+                mContext.startActivity(intent)
+            }
+            holder.nameChat.setOnClickListener { view: View? ->
+                val intent = Intent(mContext, PersonalChatAC::class.java)
+                intent.putExtra("ChatUser", true)
+                intent.putExtra("chatUserId", user.userId)
+                mContext.startActivity(intent)
+            }
         }
-
     }
 
-    @Override
-    public int getItemCount() {
-        return mUser.size();
+    override fun getItemCount(): Int {
+        return mUser.size
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val image: CircleImageView
+        val nameChat: TextView
+        val context: TextView
+        val delete: Button
 
-        private CircleImageView image;
-        private TextView nameChat;
-        private TextView context;
-        private Button delete;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            image = itemView.findViewById(R.id.userChatProfile);
-            nameChat = itemView.findViewById(R.id.userNameChat);
-            context = itemView.findViewById(R.id.textChat);
-            delete = itemView.findViewById(R.id.removeMatch);
-
+        init {
+            image = itemView.findViewById(R.id.userChatProfile)
+            nameChat = itemView.findViewById(R.id.userNameChat)
+            context = itemView.findViewById(R.id.textChat)
+            delete = itemView.findViewById(R.id.removeMatch)
         }
     }
 }
